@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans>
+<beanDefinition>
 
-    <bean id="userService" class="com.example.service.UserService"/>
-    <bean id="carService" class="com.example.service.CarService"/>
+    <bean id="userService" class="com.example.service.UserService">
+        <!--        <constructor-args>-->
+        <!--            <argument>carService</argument>-->
+        <!--        </constructor-args>-->
+        <fields>
+            <field>carService</field>
+        </fields>
+    </bean>
+
+    <bean id="carService" class="com.example.service.CarService">
+        <fields>
+            <field>bikeService</field>
+        </fields>
+    </bean>
+
     <bean id="bikeService" class="com.example.service.impl.BikeService"/>
 
-</beans>
+</beanDefinition>

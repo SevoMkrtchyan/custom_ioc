@@ -1,12 +1,10 @@
 package com.example.service.impl;
 
-import com.example.annotation.Inject;
 import com.example.model.Car;
 import com.example.service.CarService;
 
 public class CarServiceImpl implements CarService {
 
-    @Inject
     private BikeService bikeService;
 
     @Override

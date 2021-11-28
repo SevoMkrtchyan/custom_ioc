@@ -1,12 +1,11 @@
 package com.example.components;
 
-import com.example.engine.ApplicationContext;
-
 import java.util.List;
+import java.util.Map;
+
 
 public interface BeanConfigurator {
 
-    default <T> void startupBeanConfigurator(List<String> beans, ApplicationContext context) {}
+    <T> void configure(T bean, Map<String, List<String>> beanAttributes, BeanFactory factory);
 
-    <T> void configure(T t, ApplicationContext context);
 }
