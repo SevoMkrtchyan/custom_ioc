@@ -8,6 +8,8 @@ import com.example.service.UserService;
 public class UserServiceImpl implements UserService {
 
     private CarService carService;
+    private BikeService bikeService;
+
 
     @Override
     public void printUser(User user) {
@@ -16,6 +18,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addCarModel(Car car, User user) {
+        System.out.println("--------------------------");
+        System.out.println("Bikes was print from userServiceImpl");
+        bikeService.printBikes();
         user.setCarModel(carService.returnCarModel(car));
         System.out.println("from UserServiceImpl");
         System.out.println(user);

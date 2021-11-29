@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface BeanConfigurator {
 
-    <T> void configure(T bean, Map<String, List<String>> beanAttributes, BeanFactory factory);
+    <T> T configure(BeanDefinition beanDefinition, Map<String, List<String>> beanAttributes, BeanFactory factory);
 
 }

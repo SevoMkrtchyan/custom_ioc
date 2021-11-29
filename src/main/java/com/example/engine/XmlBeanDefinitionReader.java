@@ -1,5 +1,7 @@
 package com.example.engine;
 
+import com.example.components.BeanDefinition;
+import com.example.components.Scanner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,11 +21,18 @@ import java.util.Map;
 
 public class XmlBeanDefinitionReader {
 
-    private final String FILEPATH;
+    private final List<BeanDefinition> beanDefinitions;
+    private String FILEPATH;
     private final Map<String, Map<String, List<String>>> attributes;
+    private final Scanner scanner = new Scanner();
 
-    public XmlBeanDefinitionReader(String xmlFile) {
-        this.FILEPATH = xmlFile;
+    public XmlBeanDefinitionReader() {
+        scanner.getResources().forEach(s -> {
+            if (s.endsWith("applicationContext.xml")) {
+                FILEPATH = s;
+            }
+        });
+        this.beanDefinitions = new LinkedList<>();
         this.attributes = new HashMap<>();
     }
 
@@ -49,6 +58,8 @@ public class XmlBeanDefinitionReader {
                     if (fields != null) {
                         findFieldArgs(fields, injectedSource);
                     }
+                    String beanId = element.getAttribute("id");
+                    registerBeanParameters(beanId, node);
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -82,31 +93,61 @@ public class XmlBeanDefinitionReader {
 
     private void findFieldArgs(Node node, String bean) {
         Element arg = (Element) node;
-        String argument = arg.getTextContent().replaceAll("\\s+", "");
+        String[] argument = arg.getTextContent().split("\\s+");
         if (attributes.containsKey(bean)) {
             Map<String, List<String>> fieldArgs = attributes.get(bean);
             if (fieldArgs.containsKey("fields")) {
                 List<String> arguments = fieldArgs.get("fields");
-                arguments.add(argument);
+                addArgumentsOnList(arguments, argument);
             } else {
                 List<String> arguments = new LinkedList<>();
-                arguments.add(argument);
+                addArgumentsOnList(arguments, argument);
                 fieldArgs.put("fields", arguments);
                 attributes.put(bean, fieldArgs);
             }
         } else {
             Map<String, List<String>> fieldArgs = new HashMap<>();
             List<String> arguments = new LinkedList<>();
-            arguments.add(argument);
+            addArgumentsOnList(arguments, argument);
             fieldArgs.put("fields", arguments);
             attributes.put(bean, fieldArgs);
             System.out.println(attributes);
         }
     }
 
+    private void addArgumentsOnList(List<String> arguments, String[] args) {
+        for (String arg : args) {
+            if (!arg.isEmpty() && !arg.isBlank()) {
+                arguments.add(arg);
+            }
+        }
+    }
+
     public Map<String, Map<String, List<String>>> getAttributes() {
         scanXmlApplicationContext();
         return attributes;
+    }
+
+    public List<BeanDefinition> getBeanDefinitions() {
+        return beanDefinitions;
+    }
+
+    private void registerBeanParameters(String beanId, Node node) {
+        BeanDefinition beanDefinition = new BeanDefinition();
+        beanDefinition.setId(beanId);
+        Node init = ((Element) node).getElementsByTagName("init").item(0);
+        Node destroy = ((Element) node).getElementsByTagName("destroy").item(0);
+        Node scope = ((Element) node).getElementsByTagName("scope").item(0);
+        if (init != null) {
+            beanDefinition.setInitMethodName(init.getTextContent());
+        }
+        if (destroy != null) {
+            beanDefinition.setDestroyMethodName(destroy.getTextContent());
+        }
+        if (scope != null) {
+            beanDefinition.setScope(scope.getTextContent());
+        }
+        beanDefinitions.add(beanDefinition);
     }
 
 }

@@ -13,11 +13,13 @@ public class Main {
         User user = new User("Poxos", "Poxosyan", "poxos@mail.ru", "poxos");
         Car car = new Car(5000, "Mercedes", "w140");
         ApplicationContext context =
-                Application.runWithXmlConfiguration("com.example", "applicationContext.xml");
+                Application.runWithXmlConfiguration("com.example");
         UserService userService = context.getBean(UserService.class);
         userService.printUser(user);
         CarService carService = context.getBean(CarService.class);
         carService.printCar(car);
         userService.addCarModel(car, user);
+
     }
+
 }

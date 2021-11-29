@@ -8,7 +8,11 @@
         <!--        </constructor-args>-->
         <fields>
             <field>carService</field>
+            <field>bikeService</field>
         </fields>
+        <scope>singleton</scope>
+        <init>init</init>
+        <destroy>destroy</destroy>
     </bean>
 
     <bean id="carService" class="com.example.service.CarService">
