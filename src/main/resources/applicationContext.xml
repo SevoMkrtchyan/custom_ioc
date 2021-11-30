@@ -18,6 +18,10 @@
         </fields>
     </bean>
 
-    <bean id="bikeService" class="com.example.service.impl.BikeService"/>
+    <bean id="bikeService" class="com.example.service.impl.BikeService">
+        <fields>
+            <field>userService</field>
+        </fields>
+    </bean>
 
 </beanDefinition>

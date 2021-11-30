@@ -4,8 +4,6 @@ import com.example.attribute.AttributeType;
 import com.example.attribute.BeanDefinition;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
@@ -21,10 +19,6 @@ public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
             e.printStackTrace();
         }
         return beanDefinition;
-    }
-
-    private <T> void configureConstructor(T bean, Map<String, List<String>> dependencies) throws ClassNotFoundException {
-        // TODO: 28.11.21 do inject with constructor by xml config attributes
     }
 
     private void configureField(BeanDefinition beanDefinition, BeanFactory factory) throws ClassNotFoundException {
