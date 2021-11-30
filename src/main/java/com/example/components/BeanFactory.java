@@ -33,7 +33,6 @@ public class BeanFactory {
 
     public <T> T createBean(Class<T> implClass, String beanId) {
         T t = null;
-        int index = 0;
         BeanDefinition beanDefinition = null;
         for (BeanDefinition definition : tempBeanDefinitions) {
             if (definition.getId().endsWith(beanId)) {
