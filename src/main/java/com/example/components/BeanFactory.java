@@ -1,25 +1,26 @@
 package com.example.components;
 
+import com.example.attribute.BeanDefinition;
 import com.example.engine.XmlBeanDefinitionReader;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class BeanFactory {
 
     private Reflections scanner;
-    private Map<String, Map<String, List<String>>> beanDefinitionsAttributes;
     private final List<BeanConfigurator> configurators = new ArrayList<>();
+    private final List<BeanDefinition> tempBeanDefinitions;
     private final List<BeanDefinition> beanDefinitions;
     private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader();
 
     public BeanFactory(String packageToScan) {
-        this.beanDefinitionsAttributes = reader.getAttributes();
-        this.beanDefinitions = reader.getBeanDefinitions();
+        this.beanDefinitions = new LinkedList<>();
+        this.tempBeanDefinitions = reader.getBeanDefinitions();
         this.scanner = new Reflections(packageToScan);
         for (Class<? extends BeanConfigurator> aClass : scanner.getSubTypesOf(BeanConfigurator.class)) {
             try {
@@ -32,28 +33,25 @@ public class BeanFactory {
 
     public <T> T createBean(Class<T> implClass, String beanId) {
         T t = null;
+        int index = 0;
         BeanDefinition beanDefinition = null;
-        for (BeanDefinition definition : beanDefinitions) {
-            if (beanId.equalsIgnoreCase(definition.getId())) {
+        for (BeanDefinition definition : tempBeanDefinitions) {
+            if (definition.getId().endsWith(beanId)) {
                 beanDefinition = definition;
+                break;
             }
         }
         try {
             t = create(implClass);
-            for (String beanDefinitionKey : beanDefinitionsAttributes.keySet()) {
-                if (beanDefinitionKey.endsWith(beanId)) {
-                    Map<String, List<String>> beanDefinitionAttributes = beanDefinitionsAttributes.get(beanDefinitionKey);
-                    if (beanDefinition != null) {
-                        beanDefinition.setClazz(t);
-                    }
-                    if (beanDefinitionAttributes != null) {
-                        beanDefinition = configureBean(beanDefinition, beanDefinitionAttributes);
-                    }
-                } else {
-                    if (beanDefinition != null) {
-                        beanDefinition.setClazz(t);
-                    }
+            if (beanDefinition != null) {
+                if (beanDefinition.getBeanAttribute() != null) {
+                    beanDefinition.setClazz(t);
+                    beanDefinition = configureBean(beanDefinition);
+                    beanDefinition.setConfigured(true);
                 }
+                beanDefinition.setConfigured(true);
+                beanDefinition.setClazz(t);
+
             }
             beanDefinitions.add(beanDefinition);
         } catch (InstantiationException
@@ -65,10 +63,10 @@ public class BeanFactory {
         return (T) beanDefinition.getClazz();
     }
 
-    public <T> BeanDefinition configureBean(BeanDefinition beanDefinition, Map<String, List<String>> beanDefinitionAttributes) {
+    public BeanDefinition configureBean(BeanDefinition beanDefinition) {
         BeanDefinition configuredBeanDefinition = null;
         for (BeanConfigurator configurator : configurators) {
-            configuredBeanDefinition = configurator.configure(beanDefinition, beanDefinitionAttributes, this);
+            configuredBeanDefinition = configurator.configure(beanDefinition, this);
         }
         return configuredBeanDefinition;
     }
@@ -80,19 +78,18 @@ public class BeanFactory {
 
     public <T> T getBean(Class<T> type) throws ClassNotFoundException {
         Class<? extends T> implClass = type;
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            if (beanDefinition.getId().equalsIgnoreCase(type.getSimpleName())) {
-                if (type.isInterface()) {
-                    implClass = getImplClass(type);
+        if (!beanDefinitions.isEmpty()) {
+            for (BeanDefinition beanDefinition : beanDefinitions) {
+                if (beanDefinition.isConfigured() && beanDefinition.getId().equals(type.getName())) {
+                    return (T) beanDefinition.getClazz();
                 }
-                T bean = (T) createBean(implClass, type.getSimpleName());
-                return (T) bean;
             }
         }
-        T bean = createBean(implClass, type.getSimpleName());
-        return bean;
+        if (type.isInterface()) {
+            implClass = getImplClass(type);
+        }
+        return createBean(implClass, type.getSimpleName());
     }
-
 
     public <T> Class<? extends T> getImplClass(Class<T> parentInterface) {
         Set<Class<? extends T>> classes = scanner.getSubTypesOf(parentInterface);
@@ -102,7 +99,4 @@ public class BeanFactory {
         return classes.iterator().next();
     }
 
-    public List<BeanDefinition> getBeanDefinitions() {
-        return beanDefinitions;
-    }
 }

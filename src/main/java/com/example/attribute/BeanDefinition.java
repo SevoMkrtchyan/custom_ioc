@@ -1,4 +1,4 @@
-package com.example.components;
+package com.example.attribute;
 
 public class BeanDefinition {
 
@@ -7,16 +7,19 @@ public class BeanDefinition {
     private String scope;
     private String initMethodName;
     private String destroyMethodName;
+    private BeanAttribute beanAttribute;
+    private boolean configured = false;
 
     public BeanDefinition() {
     }
 
-    public BeanDefinition(String id, Class<?> clazz, String scope, String initMethodName, String destroyMethodName) {
+    public BeanDefinition(String id, Class<?> clazz, String scope, String initMethodName, String destroyMethodName, BeanAttribute beanAttribute) {
         this.id = id;
         this.clazz = clazz;
         this.scope = scope;
         this.initMethodName = initMethodName;
         this.destroyMethodName = destroyMethodName;
+        this.beanAttribute = beanAttribute;
     }
 
     public String getId() {
@@ -57,6 +60,22 @@ public class BeanDefinition {
 
     public void setDestroyMethodName(String destroyMethodName) {
         this.destroyMethodName = destroyMethodName;
+    }
+
+    public BeanAttribute getBeanAttribute() {
+        return beanAttribute;
+    }
+
+    public void setBeanAttribute(BeanAttribute beanAttribute) {
+        this.beanAttribute = beanAttribute;
+    }
+
+    public boolean isConfigured() {
+        return configured;
+    }
+
+    public void setConfigured(boolean configured) {
+        this.configured = configured;
     }
 
 }

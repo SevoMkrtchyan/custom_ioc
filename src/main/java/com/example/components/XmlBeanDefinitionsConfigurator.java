@@ -1,5 +1,8 @@
 package com.example.components;
 
+import com.example.attribute.AttributeType;
+import com.example.attribute.BeanDefinition;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -8,28 +11,29 @@ import java.util.Objects;
 public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
 
     @Override
-    public <T> T configure(BeanDefinition beanDefinition, Map<String, List<String>> beanAttributes, BeanFactory factory) {
+    public BeanDefinition configure(BeanDefinition beanDefinition, BeanFactory factory) {
         try {
-            if (!beanAttributes.isEmpty()) {
-                if (!beanAttributes.get("fields").isEmpty()) {
-                    beanDefinition = configureField(beanDefinition, beanAttributes.get("fields"), factory);
-                }
+            if (beanDefinition.getBeanAttribute() != null &&
+                    beanDefinition.getBeanAttribute().getType() == AttributeType.FIELD) {
+                configureField(beanDefinition, factory);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return (T) beanDefinition;
+        return beanDefinition;
     }
 
     private <T> void configureConstructor(T bean, Map<String, List<String>> dependencies) throws ClassNotFoundException {
         // TODO: 28.11.21 do inject with constructor by xml config attributes
     }
 
-    private <T> T configureField(BeanDefinition beanDefinition, List<String> dependencies, BeanFactory factory) throws ClassNotFoundException {
-        for (String injectedBeanName : dependencies) {
+    private void configureField(BeanDefinition beanDefinition, BeanFactory factory) throws ClassNotFoundException {
+        for (String injectedBeanName : beanDefinition.getBeanAttribute().getAttributes()) {
             Field declaredField = null;
             try {
-                declaredField = beanDefinition.getClazz().getClass().getDeclaredField(injectedBeanName);
+                String[] split = injectedBeanName.split("\\.");
+                String beanName = split[split.length - 1];
+                declaredField = beanDefinition.getClazz().getClass().getDeclaredField(beanName);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
@@ -41,7 +45,6 @@ public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
                 e.printStackTrace();
             }
         }
-        return (T) beanDefinition;
     }
 
 }

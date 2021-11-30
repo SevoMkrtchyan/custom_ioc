@@ -3,9 +3,6 @@
 <beanDefinition>
 
     <bean id="userService" class="com.example.service.UserService">
-        <!--        <constructor-args>-->
-        <!--            <argument>carService</argument>-->
-        <!--        </constructor-args>-->
         <fields>
             <field>carService</field>
             <field>bikeService</field>

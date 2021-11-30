@@ -1,6 +1,8 @@
 package com.example.engine;
 
-import com.example.components.BeanDefinition;
+import com.example.attribute.AttributeType;
+import com.example.attribute.BeanAttribute;
+import com.example.attribute.BeanDefinition;
 import com.example.components.Scanner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,16 +16,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class XmlBeanDefinitionReader {
 
     private final List<BeanDefinition> beanDefinitions;
     private String FILEPATH;
-    private final Map<String, Map<String, List<String>>> attributes;
     private final Scanner scanner = new Scanner();
 
     public XmlBeanDefinitionReader() {
@@ -33,11 +33,11 @@ public class XmlBeanDefinitionReader {
             }
         });
         this.beanDefinitions = new LinkedList<>();
-        this.attributes = new HashMap<>();
     }
 
     private void scanXmlApplicationContext() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        BeanDefinition beanDefinition = null;
         try {
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -49,17 +49,15 @@ public class XmlBeanDefinitionReader {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     String injectedSource = element.getAttribute("class").replaceAll("\\s+", "");
-                    attributes.put(injectedSource, new HashMap<>());
-                    Node constructor = ((Element) node).getElementsByTagName("constructor-args").item(0);
-                    if (constructor != null) {
-                        findConstructorArgs(constructor, injectedSource);
-                    }
                     Node fields = ((Element) node).getElementsByTagName("fields").item(0);
                     if (fields != null) {
-                        findFieldArgs(fields, injectedSource);
+                        beanDefinition = findFieldArgs(fields, injectedSource);
+                        beanDefinition.setId(injectedSource);
+                    } else {
+                        beanDefinition = new BeanDefinition();
+                        beanDefinition.setId(injectedSource);
                     }
-                    String beanId = element.getAttribute("id");
-                    registerBeanParameters(beanId, node);
+                    registerBeanParameters(beanDefinition, node);
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
@@ -67,74 +65,30 @@ public class XmlBeanDefinitionReader {
         }
     }
 
-    private void findConstructorArgs(Node node, String bean) {
-        Element arg = (Element) node;
-        String argument = arg.getTextContent().replaceAll("\\s+", "");
-        if (attributes.containsKey(bean)) {
-            Map<String, List<String>> constructorArguments = attributes.get(bean);
-            if (constructorArguments.containsKey("constructor-args")) {
-                List<String> arguments = constructorArguments.get("constructor-args");
-                arguments.add(argument);
-            } else {
-                List<String> arguments = new LinkedList<>();
-                arguments.add(argument);
-                constructorArguments.put("constructor-args", arguments);
-                attributes.put(bean, constructorArguments);
-            }
-        } else {
-            Map<String, List<String>> constructorArguments = new HashMap<>();
-            List<String> arguments = new LinkedList<>();
-            arguments.add(argument);
-            constructorArguments.put("constructor-args", arguments);
-            attributes.put(bean, constructorArguments);
-            System.out.println(attributes);
-        }
-    }
-
-    private void findFieldArgs(Node node, String bean) {
+    private BeanDefinition findFieldArgs(Node node, String bean) {
+        BeanDefinition beanDefinition = new BeanDefinition();
         Element arg = (Element) node;
         String[] argument = arg.getTextContent().split("\\s+");
-        if (attributes.containsKey(bean)) {
-            Map<String, List<String>> fieldArgs = attributes.get(bean);
-            if (fieldArgs.containsKey("fields")) {
-                List<String> arguments = fieldArgs.get("fields");
-                addArgumentsOnList(arguments, argument);
-            } else {
-                List<String> arguments = new LinkedList<>();
-                addArgumentsOnList(arguments, argument);
-                fieldArgs.put("fields", arguments);
-                attributes.put(bean, fieldArgs);
+        BeanAttribute beanAttribute = new BeanAttribute();
+        List<String> args = Arrays.asList(argument);
+        List<String> beanAttributes = new LinkedList<>();
+        args.forEach(e -> {
+            if (!e.isEmpty() && !e.isBlank()) {
+                beanAttributes.add(e);
             }
-        } else {
-            Map<String, List<String>> fieldArgs = new HashMap<>();
-            List<String> arguments = new LinkedList<>();
-            addArgumentsOnList(arguments, argument);
-            fieldArgs.put("fields", arguments);
-            attributes.put(bean, fieldArgs);
-            System.out.println(attributes);
-        }
-    }
-
-    private void addArgumentsOnList(List<String> arguments, String[] args) {
-        for (String arg : args) {
-            if (!arg.isEmpty() && !arg.isBlank()) {
-                arguments.add(arg);
-            }
-        }
-    }
-
-    public Map<String, Map<String, List<String>>> getAttributes() {
-        scanXmlApplicationContext();
-        return attributes;
+        });
+        beanAttribute.setAttributes(beanAttributes);
+        beanAttribute.setType(AttributeType.FIELD);
+        beanDefinition.setBeanAttribute(beanAttribute);
+        return beanDefinition;
     }
 
     public List<BeanDefinition> getBeanDefinitions() {
+        scanXmlApplicationContext();
         return beanDefinitions;
     }
 
-    private void registerBeanParameters(String beanId, Node node) {
-        BeanDefinition beanDefinition = new BeanDefinition();
-        beanDefinition.setId(beanId);
+    private void registerBeanParameters(BeanDefinition beanDefinition, Node node) {
         Node init = ((Element) node).getElementsByTagName("init").item(0);
         Node destroy = ((Element) node).getElementsByTagName("destroy").item(0);
         Node scope = ((Element) node).getElementsByTagName("scope").item(0);

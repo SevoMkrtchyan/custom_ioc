@@ -1,11 +1,9 @@
 package com.example.components;
 
-import java.util.List;
-import java.util.Map;
-
+import com.example.attribute.BeanDefinition;
 
 public interface BeanConfigurator {
 
-    <T> T configure(BeanDefinition beanDefinition, Map<String, List<String>> beanAttributes, BeanFactory factory);
+    BeanDefinition configure(BeanDefinition beanDefinition, BeanFactory factory);
 
 }
