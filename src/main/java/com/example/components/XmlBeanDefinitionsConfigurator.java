@@ -2,6 +2,7 @@ package com.example.components;
 
 import com.example.attribute.AttributeType;
 import com.example.attribute.BeanDefinition;
+import com.example.engine.BeanFactory;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

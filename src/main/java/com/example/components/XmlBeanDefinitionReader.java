@@ -1,9 +1,10 @@
-package com.example.engine;
+package com.example.components;
 
 import com.example.attribute.AttributeType;
 import com.example.attribute.BeanAttribute;
 import com.example.attribute.BeanDefinition;
-import com.example.components.Scanner;
+import com.example.attribute.Scope;
+import com.example.components.PackageScanner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,7 +25,7 @@ public class XmlBeanDefinitionReader {
 
     private final List<BeanDefinition> beanDefinitions;
     private String FILEPATH;
-    private final Scanner scanner = new Scanner();
+    private final PackageScanner scanner = new PackageScanner();
 
     public XmlBeanDefinitionReader() {
         scanner.getResources().forEach(s -> {
@@ -99,7 +100,13 @@ public class XmlBeanDefinitionReader {
             beanDefinition.setDestroyMethodName(destroy.getTextContent());
         }
         if (scope != null) {
-            beanDefinition.setScope(scope.getTextContent());
+            if (scope.getTextContent().equalsIgnoreCase("singleton")){
+                beanDefinition.setScope(Scope.SINGLETON);
+            }else {
+                beanDefinition.setScope(Scope.PROTOTYPE);
+            }
+        }else{
+            beanDefinition.setScope(Scope.SINGLETON);
         }
         beanDefinitions.add(beanDefinition);
     }

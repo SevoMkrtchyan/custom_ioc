@@ -1,7 +1,5 @@
 package com.example.engine;
 
-import com.example.components.BeanFactory;
-
 public class XmlApplicationContext implements ApplicationContext {
 
     private final BeanFactory factory;

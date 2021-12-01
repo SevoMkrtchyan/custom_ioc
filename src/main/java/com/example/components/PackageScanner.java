@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-public class Scanner {
+public class PackageScanner {
 
     public Collection<String> getResources() {
         final ArrayList<String> retval = new ArrayList<>();

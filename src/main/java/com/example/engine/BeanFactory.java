@@ -1,7 +1,10 @@
-package com.example.components;
+package com.example.engine;
 
 import com.example.attribute.BeanDefinition;
-import com.example.engine.XmlBeanDefinitionReader;
+import com.example.components.BeanConfigurator;
+import com.example.components.DestroyMethod;
+import com.example.components.InitMethod;
+import com.example.components.XmlBeanDefinitionReader;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,11 +17,15 @@ public class BeanFactory {
     private final Reflections scanner;
     private final List<BeanConfigurator> configurators = new ArrayList<>();
     private final List<BeanDefinition> beanDefinitions;
+    private final InitMethod initMethod;
+    private final DestroyMethod destroyMethod;
 
     public BeanFactory(String packageToScan) {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader();
         this.beanDefinitions = reader.getBeanDefinitions();
         this.scanner = new Reflections(packageToScan);
+        this.initMethod = new InitMethod();
+        this.destroyMethod = new DestroyMethod();
         for (Class<? extends BeanConfigurator> aClass : scanner.getSubTypesOf(BeanConfigurator.class)) {
             try {
                 configurators.add(aClass.getDeclaredConstructor().newInstance());
@@ -59,7 +66,6 @@ public class BeanFactory {
 
     public BeanDefinition configureBean(BeanDefinition beanDefinition) {
         for (BeanConfigurator configurator : configurators) {
-            configurator.initMethod(beanDefinition);
             beanDefinition = configurator.configure(beanDefinition, this);
         }
         return beanDefinition;
@@ -74,6 +80,10 @@ public class BeanFactory {
         if (!beanDefinitions.isEmpty()) {
             for (BeanDefinition beanDefinition : beanDefinitions) {
                 if (beanDefinition.isConfigured() && beanDefinition.getId().equals(type.getName())) {
+                    destroyMethod.callDestroyMethod(beanDefinitions);
+                    if (beanDefinition.getInitMethodName() != null) {
+                        initMethod.callInitMethod(beanDefinition);
+                    }
                     return (T) beanDefinition.getCreatedInstance();
                 }
             }

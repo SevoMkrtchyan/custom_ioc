@@ -4,7 +4,7 @@ public class BeanDefinition {
 
     private String id;
     private Object createdInstance;
-    private String scope;
+    private Scope scope;
     private String initMethodName;
     private String destroyMethodName;
     private BeanAttribute beanAttribute;
@@ -13,7 +13,7 @@ public class BeanDefinition {
     public BeanDefinition() {
     }
 
-    public BeanDefinition(String id, Class<?> clazz, String scope, String initMethodName, String destroyMethodName, BeanAttribute beanAttribute) {
+    public BeanDefinition(String id, Class<?> clazz, Scope scope, String initMethodName, String destroyMethodName, BeanAttribute beanAttribute) {
         this.id = id;
         this.createdInstance = clazz;
         this.scope = scope;
@@ -38,11 +38,11 @@ public class BeanDefinition {
         this.createdInstance = createdInstance;
     }
 
-    public String getScope() {
+    public Scope getScope() {
         return scope;
     }
 
-    public void setScope(String scope) {
+    public void setScope(Scope scope) {
         this.scope = scope;
     }
 

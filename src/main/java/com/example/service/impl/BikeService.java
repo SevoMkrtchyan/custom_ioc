@@ -12,5 +12,4 @@ public class BikeService {
         userService.printUser(new User("petros","petrosyan","petros@mail.ru","petros"));
     }
 
-
 }
