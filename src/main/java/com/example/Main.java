@@ -1,14 +1,11 @@
 package com.example;
 
-import com.example.components.PackageScanner;
 import com.example.engine.Application;
 import com.example.engine.ApplicationContext;
 import com.example.model.Car;
 import com.example.model.User;
 import com.example.service.CarService;
 import com.example.service.UserService;
-
-import java.util.Scanner;
 
 public class Main {
 
@@ -29,8 +26,6 @@ public class Main {
         UserService qqqq = context.getBean(UserService.class);
         qqqq.printUser(user1);
 
-//        Scanner scanner= new Scanner(System.in);
-//        String next = scanner.next();
     }
 
 }

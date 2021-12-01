@@ -53,7 +53,6 @@ public class BeanFactory {
                     beanDefinition = configureBean(beanDefinition);
                 }
                 beanDefinition.setCreatedInstance(t);
-
             }
         } catch (InstantiationException
                 | IllegalAccessException
