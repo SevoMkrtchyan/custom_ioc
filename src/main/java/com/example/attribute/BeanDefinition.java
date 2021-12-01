@@ -3,7 +3,7 @@ package com.example.attribute;
 public class BeanDefinition {
 
     private String id;
-    private Object clazz;
+    private Object createdInstance;
     private String scope;
     private String initMethodName;
     private String destroyMethodName;
@@ -15,7 +15,7 @@ public class BeanDefinition {
 
     public BeanDefinition(String id, Class<?> clazz, String scope, String initMethodName, String destroyMethodName, BeanAttribute beanAttribute) {
         this.id = id;
-        this.clazz = clazz;
+        this.createdInstance = clazz;
         this.scope = scope;
         this.initMethodName = initMethodName;
         this.destroyMethodName = destroyMethodName;
@@ -30,12 +30,12 @@ public class BeanDefinition {
         this.id = id;
     }
 
-    public Object getClazz() {
-        return clazz;
+    public Object getCreatedInstance() {
+        return createdInstance;
     }
 
-    public void setClazz(Object clazz) {
-        this.clazz = clazz;
+    public void setCreatedInstance(Object createdInstance) {
+        this.createdInstance = createdInstance;
     }
 
     public String getScope() {

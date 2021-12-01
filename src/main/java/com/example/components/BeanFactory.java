@@ -42,10 +42,10 @@ public class BeanFactory {
             if (beanDefinition != null) {
                 beanDefinition.setConfigured(true);
                 if (beanDefinition.getBeanAttribute() != null) {
-                    beanDefinition.setClazz(t);
+                    beanDefinition.setCreatedInstance(t);
                     beanDefinition = configureBean(beanDefinition);
                 }
-                beanDefinition.setClazz(t);
+                beanDefinition.setCreatedInstance(t);
 
             }
         } catch (InstantiationException
@@ -54,11 +54,12 @@ public class BeanFactory {
                 | NoSuchMethodException e) {
             e.printStackTrace();
         }
-        return (T) beanDefinition.getClazz();
+        return (T) beanDefinition.getCreatedInstance();
     }
 
     public BeanDefinition configureBean(BeanDefinition beanDefinition) {
         for (BeanConfigurator configurator : configurators) {
+            configurator.initMethod(beanDefinition);
             beanDefinition = configurator.configure(beanDefinition, this);
         }
         return beanDefinition;
@@ -73,7 +74,7 @@ public class BeanFactory {
         if (!beanDefinitions.isEmpty()) {
             for (BeanDefinition beanDefinition : beanDefinitions) {
                 if (beanDefinition.isConfigured() && beanDefinition.getId().equals(type.getName())) {
-                    return (T) beanDefinition.getClazz();
+                    return (T) beanDefinition.getCreatedInstance();
                 }
             }
         }

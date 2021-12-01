@@ -16,6 +16,7 @@
         <fields>
             <field>bikeService</field>
         </fields>
+        <init>initfromCarService</init>
     </bean>
 
     <bean id="bikeService" class="com.example.service.impl.BikeService">

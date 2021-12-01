@@ -20,5 +20,8 @@ public class CarServiceImpl implements CarService {
         return car.getModel();
     }
 
+    public void initfromCarService() {
+        System.out.println("CarServiceImpl Init method works");
+    }
 
 }

@@ -32,14 +32,13 @@ public class Scanner {
             final Pattern pattern) {
         final ArrayList<String> retval = new ArrayList<>();
         final File[] fileList = directory.listFiles();
-        for (final File file : fileList) {
+        for (final File file : fileList != null ? fileList : new File[0]) {
             if (file.isDirectory()) {
                 retval.addAll(getResourcesFromDirectory(file, pattern));
             } else {
                 final String fileName;
                 try {
                     fileName = file.getCanonicalPath();
-
                     final boolean accept = pattern.matcher(fileName).matches();
                     if (accept) {
                         if (fileName.endsWith(".xml")) {

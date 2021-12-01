@@ -4,7 +4,10 @@ import com.example.attribute.AttributeType;
 import com.example.attribute.BeanDefinition;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
 
@@ -27,14 +30,16 @@ public class XmlBeanDefinitionsConfigurator implements BeanConfigurator {
             try {
                 String[] split = injectedBeanName.split("\\.");
                 String beanName = split[split.length - 1];
-                declaredField = beanDefinition.getClazz().getClass().getDeclaredField(beanName);
+                declaredField = beanDefinition.getCreatedInstance().getClass().getDeclaredField(beanName);
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+                List<String> collect = Arrays.stream(e.getStackTrace()).map(line -> line + "\n").collect(Collectors.toList());
+                throw new RuntimeException(e.getMessage() + " field not found please check your config " +
+                        " injected bean name would be the same as field" + collect);
             }
             Objects.requireNonNull(declaredField).setAccessible(true);
             Object object = factory.getBean(declaredField.getType());
             try {
-                declaredField.set(beanDefinition.getClazz(), object);
+                declaredField.set(beanDefinition.getCreatedInstance(), object);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }

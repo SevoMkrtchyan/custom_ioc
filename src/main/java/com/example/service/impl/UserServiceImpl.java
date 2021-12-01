@@ -27,4 +27,8 @@ public class UserServiceImpl implements UserService {
         System.out.println("--------------------------");
     }
 
+    public void init() {
+        System.out.println("UserServiceImpl Init method works");
+    }
+
 }

@@ -4,6 +4,10 @@ import com.example.attribute.BeanDefinition;
 
 public interface BeanConfigurator {
 
-    BeanDefinition configure(BeanDefinition beanDefinition, BeanFactory factory);
+    default BeanDefinition configure(BeanDefinition beanDefinition, BeanFactory factory) {
+        return beanDefinition;
+    }
+
+    default void initMethod(BeanDefinition beanDefinition){}
 
 }
