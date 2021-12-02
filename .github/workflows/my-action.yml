@@ -21,7 +21,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
         
-    - name: check dir and whoami command
-      run: ls -la
-    - name: check users
-      run: cat /etc/passwd
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: ls target directory
+      run: cd /target && ls -la
