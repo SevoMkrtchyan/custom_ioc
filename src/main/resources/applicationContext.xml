@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beanDefinition>
+
+    <bean id="userService" class="com.example.service.UserService">
+        <fields>
+            <field>carService</field>
+            <field>bikeService</field>
+        </fields>
+        <scope>singleton</scope>
+        <init>init</init>
+        <destroy>destroy</destroy>
+    </bean>
+
+    <bean id="carService" class="com.example.service.CarService">
+        <fields>
+            <field>bikeService</field>
+        </fields>
+        <init>initfromCarService</init>
+    </bean>
+
+    <bean id="bikeService" class="com.example.service.impl.BikeService">
+        <fields>
+            <field>userService</field>
+        </fields>
+    </bean>
+
+</beanDefinition>
