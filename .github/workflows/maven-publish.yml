@@ -31,6 +31,6 @@ jobs:
     - name: clean package project
       run: mvn clean package
 
-    - name: ls target dir
-      run: cd /target && ls -la
+    - name:  test project
+      run: mvn exec:java -Dexec.mainClass=src/main/java/com/example/Main.java
       
