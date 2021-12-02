@@ -32,5 +32,5 @@ jobs:
       run: mvn clean package
 
     - name:  test project
-      run: mvn exec:java -Dexec.mainClass=src/main/java/com/example/Main.java
+      run: mvn exec:java -Dexec.mainClass=com.example.Main
       
